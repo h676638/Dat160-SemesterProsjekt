@@ -1,3 +1,4 @@
+import time
 import rclpy
 from rclpy.node import Node
 
@@ -34,12 +35,17 @@ class MarkerMapPose(Node):
         timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
+        self.last_marker_time = 0.0
+
 
     def clbk_marker_recognition(self, msg):
         self.marker_id = msg.marker_ids[0]
         self.marker_pose = msg.poses[0]
+        self.last_marker_time = time.time() 
 
     def timer_callback(self):
+        if time.time() - self.last_marker_time > 0.5:
+            return
         marker_map_pose = Pose()
         from_frame_rel = self.namespace+'/camera_rgb_optical_frame'
         to_frame_rel = 'map'
@@ -49,8 +55,8 @@ class MarkerMapPose(Node):
         try:
             self.trans_camera_map = self.tf_buffer.lookup_transform(to_frame_rel, from_frame_rel, rclpy.time.Time())
         except TransformException as ex:
-            self.get_logger().info(
-                f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
+            #self.get_logger().info(
+             #   f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
             return
 
         #Tranform a Pose from from_frame_rel to to_frame_rel

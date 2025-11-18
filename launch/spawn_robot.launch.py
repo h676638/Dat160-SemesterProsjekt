@@ -121,5 +121,5 @@ def generate_launch_description():
         spawn_entity,
         tf_map_to_odom,
         aruco_recognition,
-        robot_controller,
+        #robot_controller,
     ])

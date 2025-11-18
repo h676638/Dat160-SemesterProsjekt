@@ -12,8 +12,10 @@ class MarkerDetection(Node):
         #TODO: Create a subscriber to the marker_map_pose and the marker_id topics of either
         #      tb3_0 or tb3_1. As callback functions use clbk_marker_map_pose and clbk_marker_id.
 
-        self.sub = self.create_subscription(Int64, "/tb3_1/marker_id", self.clbk_marker_id, 10)
-        self.sub1 = self.create_subscription(Pose, "/tb3_1/marker_pose", self.clbk_marker_map_pose, 10)
+        self.sub_m = self.create_subscription(Int64, "/tb3_0/marker_id", self.clbk_marker_id, 10)
+        self.sub_p = self.create_subscription(Pose, "/tb3_0/marker_map_pose", self.clbk_marker_map_pose, 10)
+        self.sub_m1 = self.create_subscription(Int64, "/tb3_1/marker_id", self.clbk_marker_id, 10)
+        self.sub_p1 = self.create_subscription(Pose, "/tb3_1/marker_map_pose", self.clbk_marker_map_pose, 10)
         #-----------------------------------------------------------------------------------
 
         # Default values for variables
@@ -27,18 +29,19 @@ class MarkerDetection(Node):
     
     def clbk_marker_map_pose(self, msg):
         self.marker_position = msg.position
+        #self.get_logger().info(f'pose: {msg}')
 
     def clbk_marker_id(self, msg):
         self.marker_id = msg.data
+        self.get_logger().info(f'marker id: {msg.data}')
 
 
     def timer_callback(self):
         #-----------------------------------------------------------------------------------
         #TODO: Whenever the current marker_id is different than the previous marker id
         #      print out both the marker_id and the marker_position using the self.get_logger().info() function 
-        self.get_logger().info(f'{self.marker_id}')
         if self.prev_marker_id != self.marker_id:
-            self.get_logger().info(f'Prev marker: {self.prev_marker_id}\nCurrent marker: {self.prev_marker_id} pose: {self.marker_position}')
+            self.get_logger().info(f'Prev marker: {self.prev_marker_id}\nCurrent marker: {self.marker_id} pose: {self.marker_position}')
             self.prev_marker_id = self.marker_id
         #-----------------------------------------------------------------------------------
         
